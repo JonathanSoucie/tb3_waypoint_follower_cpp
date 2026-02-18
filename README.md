@@ -108,3 +108,48 @@ ros2 topic pub --once /goal_pose geometry_msgs/msg/PoseStamped "{
 ```
 
 The robot should begin navigating to the specified pose.
+
+## Parameters
+
+Parameters are defined in config/goal_sender.yaml.
+Key parameters include:
+
+action_name – Nav2 action server name (default: /navigate_to_pose)
+
+goal_topic – Topic to receive pose goals (default: /goal_pose)
+
+goal_frame – Expected coordinate frame (default: map)
+
+server_timeout_sec – Action server wait timeout
+
+cancel_on_new_goal – Cancel active goal when a new goal arrives
+
+require_goal_frame – Enforce frame consistency
+
+---
+
+## Notes
+
+Goals must be published in a frame that Nav2 can resolve (typically map)
+
+SLAM must be running and publishing a valid map → odom transform
+
+All nodes must share the same ROS_DOMAIN_ID
+
+
+## Future Improvements
+
+TF2-based frame transformation for incoming goals
+
+Waypoint queues and sequencing
+
+Integration with UI or higher-level planners
+
+Unified bringup launch file
+
+---
+
+Author
+
+Jonathan Soucie
+
