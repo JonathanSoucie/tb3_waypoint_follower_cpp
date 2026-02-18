@@ -21,19 +21,6 @@ The package implements a dedicated node, `goal_sender`, which listens for pose g
 
 ---
 
-## Package Structure
-
-tb3_waypoint_follower_cpp/
-├── src/
-│ └── goal_sender.cpp
-├── launch/
-│ └── goal_sender.launch.py
-├── config/
-│ └── goal_sender.yaml
-├── CMakeLists.txt
-├── package.xml
-└── README.md
-
 ## Dependencies
 
 - ROS 2 Humble
@@ -59,3 +46,65 @@ source /opt/ros/humble/setup.bash
 colcon build --symlink-install
 source install/setup.bash
 ```
+
+## Running the System (Multi-Terminal Setup)
+
+Each component is launched in a separate terminal.
+Make sure all terminals use the same ROS_DOMAIN_ID.
+
+### Terminal 1 — Gazebo (Simulation)
+
+```bash
+export ROS_DOMAIN_ID=30
+export TURTLEBOT3_MODEL=burger
+source /opt/ros/humble/setup.bash
+ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
+```
+
+### Terminal 2 — SLAM Toolbox
+
+```bash
+export ROS_DOMAIN_ID=30
+source /opt/ros/humble/setup.bash
+ros2 launch slam_toolbox online_async_launch.py use_sim_time:=True
+```
+### Terminal 3 — Nav2
+
+```bash
+export ROS_DOMAIN_ID=30
+export TURTLEBOT3_MODEL=burger
+source /opt/ros/humble/setup.bash
+ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True
+```
+
+This will also launch RViz with the Nav2 configuration.
+
+### Terminal 4 — Waypoint Follower Node
+
+```bash
+export ROS_DOMAIN_ID=30
+source /opt/ros/humble/setup.bash
+source ~/turtlebot3_ws/install/setup.bash
+ros2 launch tb3_waypoint_follower_cpp goal_sender.launch.py
+```
+
+This starts the goal_sender node and loads parameters from goal_sender.yaml.
+
+### Sending a Navigation Goal
+
+Open a new terminal and publish a goal:
+
+```bash
+export ROS_DOMAIN_ID=30
+source /opt/ros/humble/setup.bash
+
+ros2 topic pub --once /goal_pose geometry_msgs/msg/PoseStamped "{
+  header: {frame_id: 'map'},
+  pose: {
+    position: {x: 0.5, y: 0.0, z: 0.0},
+    orientation: {w: 1.0}
+  }
+}"
+```
+
+The robot should begin navigating to the specified pose.
