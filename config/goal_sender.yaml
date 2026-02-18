@@ -1,0 +1,8 @@
+goal_sender:
+  ros__parameters:
+    action_name: /navigate_to_pose
+    goal_topic: /goal_pose
+    goal_frame: map
+    server_timeout_sec: 50.0
+    cancel_on_new_goal: true
+    require_goal_frame: false
